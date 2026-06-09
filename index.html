@@ -5,196 +5,102 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chatterbox Turbo — transformers.js</title>
 <style>
-:root {
-  --bg:      #0a0a0f;
-  --surface: #13131a;
-  --border:  #1e1e2e;
-  --border2: #2a2a3e;
-  --text:    #e8e8f0;
-  --muted:   #6a6a8a;
-  --accent:  #7c6cf7;
-  --cyan:    #4fc3f7;
-  --green:   #3dffc0;
-  --warn:    #f7a23d;
-  --err:     #f76a6a;
-  --r:       8px;
-}
+:root{--bg:#0a0a0f;--surface:#13131a;--border:#1e1e2e;--border2:#2a2a3e;--text:#e8e8f0;--muted:#6a6a8a;--accent:#7c6cf7;--cyan:#4fc3f7;--green:#3dffc0;--warn:#f7a23d;--err:#f76a6a;--r:8px}
 *{box-sizing:border-box;margin:0;padding:0}
-
-/* noise overlay */
-body::before {
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity:.4;
-}
-
-body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;
-     display:flex;justify-content:center;padding:2.5rem 1rem 4rem;position:relative;z-index:1}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;display:flex;justify-content:center;padding:2.5rem 1rem 4rem;position:relative;z-index:1}
 .wrap{width:100%;max-width:680px;display:flex;flex-direction:column;gap:1.25rem;position:relative;z-index:1}
-
 .hdr h1{font-size:1.7rem;font-weight:800;letter-spacing:-.03em}
 .hdr h1 em{color:var(--accent);font-style:normal}
 .hdr p{font-size:.85rem;color:var(--muted);margin-top:.3rem}
-
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.card-header{padding:.75rem 1.2rem;border-bottom:1px solid var(--border);
-             display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.card-header{padding:.75rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.75rem}
 .card-header.card-footer{border-bottom:none;border-top:1px solid var(--border)}
 .card-title{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .card-body{padding:1.2rem;display:flex;flex-direction:column;gap:.9rem}
-
-textarea{background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);
-         font:inherit;font-size:.9rem;padding:.75rem;resize:vertical;min-height:90px;width:100%}
+textarea{background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font:inherit;font-size:.9rem;padding:.75rem;resize:vertical;min-height:90px;width:100%}
 textarea:focus{outline:none;border-color:var(--accent)}
-input[type=file]{font-size:.85rem;color:var(--muted);cursor:pointer;max-width:100%;
-  background:var(--bg);border:1px solid var(--border2);border-radius:6px;
-  padding:.45rem .7rem;width:100%;font-family:inherit}
+input[type=file]{font-size:.85rem;color:var(--muted);cursor:pointer;max-width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.45rem .7rem;width:100%;font-family:inherit}
 input[type=range]{accent-color:var(--accent);flex:1;min-width:0}
-input[type=text],select{
-  background:var(--bg);border:1px solid var(--border2);border-radius:6px;
-  color:var(--text);font-family:inherit;padding:.5rem .75rem;font-size:.82rem;
-  outline:none;transition:border-color .2s}
+input[type=text],select{background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:inherit;padding:.5rem .75rem;font-size:.82rem;outline:none;transition:border-color .2s}
 input[type=text]:focus,select:focus{border-color:var(--accent)}
-
 .row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
-.row label{font-size:.85rem;color:var(--muted);white-space:nowrap}
 .val{font-size:.85rem;color:var(--text);min-width:2.5rem}
-
-/* buttons */
-button{background:var(--accent);color:#fff;border:none;border-radius:var(--r);
-       padding:.6rem 1.2rem;font-size:.875rem;font-weight:600;cursor:pointer;
-       transition:opacity .15s;flex-shrink:0}
+button{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:.6rem 1.2rem;font-size:.875rem;font-weight:600;cursor:pointer;transition:opacity .15s;flex-shrink:0}
 button:hover:not(:disabled){opacity:.82}
 button:disabled{opacity:.35;cursor:not-allowed}
 .btn-sec{background:transparent;border:1px solid var(--border2);color:var(--text)}
 .btn-sm{font-size:.75rem;padding:.4rem .8rem}
 .btn-rec{background:#b91c1c;color:#fff;border:none}
-
-/* chip status */
-.chip{font-size:.82rem;padding:.45rem .85rem;border-radius:var(--r);background:var(--bg);
-      border:1px solid var(--border);color:var(--muted);min-height:2.1rem;line-height:1.4}
-.chip.ok  {border-color:var(--green);color:var(--green)}
-.chip.warn{border-color:var(--warn); color:var(--warn)}
-.chip.err {border-color:var(--err);  color:var(--err)}
-
-/* overall progress bar */
+.btn-stop{background:#7f1d1d;border:1px solid #b91c1c;color:#fca5a5}
+.chip{font-size:.82rem;padding:.45rem .85rem;border-radius:var(--r);background:var(--bg);border:1px solid var(--border);color:var(--muted);min-height:2.1rem;line-height:1.4}
+.chip.ok{border-color:var(--green);color:var(--green)}
+.chip.warn{border-color:var(--warn);color:var(--warn)}
+.chip.err{border-color:var(--err);color:var(--err)}
 .dl-prog{display:none;flex-direction:column;gap:.35rem}
 .dl-track{background:var(--border);border-radius:99px;height:6px;overflow:hidden}
-.dl-fill {background:linear-gradient(90deg,var(--accent),var(--green));height:100%;width:0;transition:width .25s;border-radius:99px}
-.dl-lbl  {font-size:.75rem;color:var(--muted);display:flex;justify-content:space-between}
-
-/* backend selector row — appears ABOVE load button */
+.dl-fill{background:linear-gradient(90deg,var(--accent),var(--green));height:100%;width:0;transition:width .25s;border-radius:99px}
+.dl-lbl{font-size:.75rem;color:var(--muted);display:flex;justify-content:space-between}
 .backend-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;font-size:.82rem}
 .backend-row label{font-size:.82rem;color:var(--muted);white-space:nowrap}
-
-/* EP chips */
 .ep-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .ep-chip{font-size:.68rem;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);color:var(--muted);transition:all .3s}
-.ep-chip.active{border-color:color-mix(in srgb,var(--green) 50%,transparent);
-                color:var(--green);background:color-mix(in srgb,var(--green) 10%,transparent)}
+.ep-chip.active{border-color:color-mix(in srgb,var(--green) 50%,transparent);color:var(--green);background:color-mix(in srgb,var(--green) 10%,transparent)}
 .ep-sep{font-size:.7rem;color:var(--muted)}
-
-/* GPU info row */
-.gpu-info-row{margin-top:.5rem;padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);
-              border-radius:6px;font-size:.7rem;color:var(--muted);line-height:1.8;display:none}
-.gpu-key  {color:var(--muted)}
-.gpu-val  {color:var(--text)}
-.gpu-good {color:var(--green)}
-.gpu-warn_ {color:var(--warn)}
-
-/* device badge */
-.badge{display:none;font-size:.7rem;padding:.15rem .55rem;border-radius:99px;
-       background:var(--border);color:var(--muted);margin-left:.4rem;vertical-align:middle}
-.badge.webgpu{background:#1a1a3a;color:var(--cyan)}
-.badge.wasm  {background:#182018;color:var(--green)}
-
-/* voice section */
+.gpu-info-row{margin-top:.5rem;padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:.7rem;color:var(--muted);line-height:1.8;display:none}
+.gpu-key{color:var(--muted)}.gpu-val{color:var(--text)}.gpu-good{color:var(--green)}.gpu-warn_{color:var(--warn)}
+.badge{display:none;font-size:.7rem;padding:.15rem .55rem;border-radius:99px;background:var(--border);color:var(--muted);margin-left:.4rem;vertical-align:middle}
+.badge.webgpu{background:#1a1a3a;color:var(--cyan)}.badge.wasm{background:#182018;color:var(--green)}
 .param-label{font-size:.72rem;color:var(--muted);letter-spacing:.04em;margin-bottom:.25rem;display:block}
 .param-group{display:flex;flex-direction:column;gap:.3rem}
-
-/* vc waveform + segment selector */
 .vc-wave-wrap{display:none;margin-top:.75rem;flex-direction:column;gap:.4rem}
 .vc-wave-header{display:flex;justify-content:space-between;align-items:center}
-.vc-filename{font-size:.7rem;color:var(--muted)}
-.vc-seg-label{font-size:.7rem;color:var(--green)}
-.vc-wave-outer{position:relative;height:60px;background:var(--bg);
-               border:1px solid var(--border);border-radius:6px;overflow:hidden;
-               cursor:ew-resize;user-select:none}
+.vc-filename{font-size:.7rem;color:var(--muted)}.vc-seg-label{font-size:.7rem;color:var(--green)}
+.vc-wave-outer{position:relative;height:60px;background:var(--bg);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:ew-resize;user-select:none}
 .vc-wave-outer canvas{position:absolute;inset:0;width:100%;height:100%}
 #vcSelLeft,#vcSelRight{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.55)}
-#vcSelLeft{left:0;width:0}
-#vcSelRight{right:0;width:0}
+#vcSelLeft{left:0;width:0}#vcSelRight{right:0;width:0}
 #vcSelBar{position:absolute;top:0;bottom:0;border:1.5px solid var(--green);border-radius:2px;pointer-events:none}
-.vc-handle{position:absolute;top:50%;transform:translateY(-50%);width:10px;height:26px;
-           background:var(--green);border-radius:3px;cursor:ew-resize;z-index:2;
-           display:flex;align-items:center;justify-content:center}
+.vc-handle{position:absolute;top:50%;transform:translateY(-50%);width:10px;height:26px;background:var(--green);border-radius:3px;cursor:ew-resize;z-index:2;display:flex;align-items:center;justify-content:center}
 .vc-handle-grip{width:2px;height:11px;background:rgba(0,0,0,.4);border-radius:1px}
 .vc-actions{display:flex;gap:.5rem;align-items:center}
 .vc-encode-status{font-size:.72rem;color:var(--muted)}
-
-/* mic recording */
 .rec-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .rec-timer{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .rec-status{font-size:.72rem;color:var(--muted)}
-
-/* params grid */
 .params-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-
-/* chunk streaming progress */
 .ck-wrap{display:none;flex-direction:column;gap:.5rem}
 .ck-track{background:var(--border);border-radius:99px;height:7px;overflow:hidden}
-.ck-fill {background:var(--green);height:100%;width:0;transition:width .35s;border-radius:99px}
-.ck-meta {display:flex;justify-content:space-between;align-items:center;font-size:.75rem;gap:.5rem}
+.ck-fill{background:var(--green);height:100%;width:0;transition:width .35s;border-radius:99px}
+.ck-meta{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;gap:.5rem}
 .ck-label{color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ck-stats{display:flex;gap:.6rem;flex-shrink:0}
-.stat    {font-size:.72rem;padding:.1rem .45rem;border-radius:4px;background:var(--bg);
-          border:1px solid var(--border);white-space:nowrap}
-.stat.ok  {border-color:var(--green);color:var(--green)}
-.stat.warn{border-color:var(--warn); color:var(--warn)}
-.stat.err {border-color:var(--err);  color:var(--err)}
-
-/* buffer depth bar */
-.buf-row {display:flex;align-items:center;gap:.5rem}
-.buf-lbl {font-size:.72rem;color:var(--muted);white-space:nowrap}
+.stat{font-size:.72rem;padding:.1rem .45rem;border-radius:4px;background:var(--bg);border:1px solid var(--border);white-space:nowrap}
+.stat.ok{border-color:var(--green);color:var(--green)}.stat.warn{border-color:var(--warn);color:var(--warn)}.stat.err{border-color:var(--err);color:var(--err)}
+.buf-row{display:flex;align-items:center;gap:.5rem}
+.buf-lbl{font-size:.72rem;color:var(--muted);white-space:nowrap}
 .buf-track{background:var(--border);border-radius:99px;height:4px;flex:1;overflow:hidden}
-.buf-fill {height:100%;border-radius:99px;width:0;transition:width .2s}
-.buf-fill.ok  {background:var(--green)}
-.buf-fill.warn{background:var(--warn)}
-.buf-fill.err {background:var(--err)}
-
-/* waveform canvas */
-.waveform-wrap{background:var(--bg);border:1px solid var(--border);border-radius:8px;
-               height:72px;display:flex;align-items:center;justify-content:center;
-               overflow:hidden;position:relative}
+.buf-fill{height:100%;border-radius:99px;width:0;transition:width .2s}
+.buf-fill.ok{background:var(--green)}.buf-fill.warn{background:var(--warn)}.buf-fill.err{background:var(--err)}
+.waveform-wrap{background:var(--bg);border:1px solid var(--border);border-radius:8px;height:72px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
 .waveform-idle{color:var(--muted);font-size:.75rem;font-style:italic}
 .waveform-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
-
 audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-radius:6px}
-
-/* pulsing dot */
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);
-     margin-right:4px;animation:pulse 1.1s ease-in-out infinite;vertical-align:middle}
-
-/* fp32 checkbox row */
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;animation:pulse 1.1s ease-in-out infinite;vertical-align:middle}
 #fp32Row{display:none;align-items:center;gap:.4rem;color:var(--muted);font-size:.82rem}
 #fp32Row input{accent-color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <!-- Header -->
   <div class="hdr">
     <h1>Chatterbox <em>Turbo</em></h1>
-    <p>100% in-browser TTS — model streams from HuggingFace via transformers.js</p>
+    <p>100% in-browser TTS — token-level streaming via transformers.js</p>
   </div>
 
-  <!-- ① Load Model -->
   <div class="card">
     <div class="card-body">
-
-      <!-- Backend selection — first so users configure before loading -->
       <div class="backend-row">
         <label for="selMode">Backend</label>
         <select id="selMode" style="flex:1">
@@ -202,35 +108,20 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
           <option value="hybrid">WebGPU hybrid — LM on GPU only</option>
           <option value="full">WebGPU full (may be silent on AMD/Mesa)</option>
         </select>
-        <div id="fp32Row">
-          <input type="checkbox" id="chkFp32">
-          <label for="chkFp32" style="cursor:pointer">Force fp32 LM</label>
-        </div>
+        <div id="fp32Row"><input type="checkbox" id="chkFp32"><label for="chkFp32" style="cursor:pointer">Force fp32 LM</label></div>
       </div>
-
-      <!-- EP / capability chips -->
       <div class="ep-row">
         <span class="ep-chip" id="ep-webgpu">webgpu</span>
         <span class="ep-chip" id="ep-wasm">wasm</span>
         <span class="ep-chip" id="ep-f16" title="GPU supports shader-f16">shader-f16</span>
         <span class="ep-sep">execution provider</span>
       </div>
-
-      <!-- GPU info row (populated after load) -->
       <div class="gpu-info-row" id="gpuInfoRow"></div>
-
-      <!-- Status chip -->
       <div id="loadChip" class="chip">Configure backend above, then click Load.</div>
-
-      <!-- Overall download progress -->
       <div class="dl-prog" id="dlProg">
         <div class="dl-track"><div class="dl-fill" id="dlFill"></div></div>
-        <div class="dl-lbl">
-          <span id="dlFile"></span>
-          <span id="dlPct"></span>
-        </div>
+        <div class="dl-lbl"><span id="dlFile"></span><span id="dlPct"></span></div>
       </div>
-
     </div>
     <div class="card-header card-footer">
       <div style="display:flex;align-items:center;gap:.5rem">
@@ -240,15 +131,12 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
     </div>
   </div>
 
-  <!-- ② Reference Voice -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">2 · Reference Voice</span>
       <span id="vcStatus" style="font-size:.72rem;color:var(--warn)">required</span>
     </div>
     <div class="card-body">
-
-      <!-- Mic recording -->
       <div class="param-group">
         <span class="param-label">Record your voice (10–15s of clear speech)</span>
         <div class="rec-row">
@@ -258,14 +146,10 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
           <span class="rec-status" id="recStatus"></span>
         </div>
       </div>
-
-      <!-- File upload -->
       <div class="param-group">
         <span class="param-label">Upload a file — drag the waveform to select a 10s segment</span>
         <input type="file" id="voiceFile" accept="audio/*" onchange="onRefAudioFile(this)">
       </div>
-
-      <!-- Waveform segment selector (hidden until file loaded) -->
       <div class="vc-wave-wrap" id="vcWaveWrap">
         <div class="vc-wave-header">
           <span class="vc-filename" id="vcFilename"></span>
@@ -273,9 +157,7 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
         </div>
         <div class="vc-wave-outer" id="vcWaveOuter">
           <canvas id="vcWaveCanvas"></canvas>
-          <div id="vcSelLeft"></div>
-          <div id="vcSelRight"></div>
-          <div id="vcSelBar"></div>
+          <div id="vcSelLeft"></div><div id="vcSelRight"></div><div id="vcSelBar"></div>
           <div class="vc-handle" id="vcHandleL"><div class="vc-handle-grip"></div></div>
           <div class="vc-handle" id="vcHandleR"><div class="vc-handle-grip"></div></div>
         </div>
@@ -286,22 +168,20 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
           <span class="vc-encode-status" id="vcEncodeStatus"></span>
         </div>
       </div>
-
       <div id="refAudioStatus" style="font-size:.72rem;color:var(--muted);display:none"></div>
     </div>
   </div>
 
-  <!-- ③ Synthesize -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">3 · Synthesize</span>
-      <button id="btnGen" disabled>▶ Generate</button>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <button id="btnGen" disabled>▶ Generate</button>
+        <button id="btnStop" class="btn-stop btn-sm" disabled style="display:none">■ Stop</button>
+      </div>
     </div>
     <div class="card-body">
-
       <textarea id="txtInput" placeholder="Enter text to synthesize…">The quick brown fox jumped over the lazy dog. Meanwhile, scientists discovered that this classic pangram has been used for over a century to test typefaces and keyboards. Remarkable, isn't it? Life is full of surprising little facts like that.</textarea>
-
-      <!-- Generation params -->
       <div class="params-grid">
         <div class="param-group">
           <span class="param-label">Exaggeration</span>
@@ -310,29 +190,16 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
             <span class="val" id="exagVal">0.50</span>
           </div>
         </div>
-        <div class="param-group">
-          <span class="param-label">Temperature</span>
-          <input type="text" id="temperature" value="0.8">
-        </div>
-        <div class="param-group">
-          <span class="param-label">Max new tokens</span>
-          <input type="text" id="maxTokens" value="600">
-        </div>
-        <div class="param-group">
-          <span class="param-label">Rep. penalty</span>
-          <input type="text" id="repPenalty" value="1.0">
-        </div>
+        <div class="param-group"><span class="param-label">Max new tokens</span><input type="text" id="maxTokens" value="600"></div>
       </div>
-
-      <!-- Chunk streaming stats (shown during generation) -->
       <div class="ck-wrap" id="ckWrap">
         <div class="ck-track"><div class="ck-fill" id="ckFill"></div></div>
         <div class="ck-meta">
           <span class="ck-label" id="ckLabel">Starting…</span>
           <div class="ck-stats">
-            <span class="stat" id="statRTF" title="Real-time factor: generation time / audio duration. <1 = streaming viable.">RTF —</span>
-            <span class="stat" id="statBuf" title="Seconds of pre-generated audio ahead of playback head.">buf —</span>
-            <span class="stat" id="statBatch" title="Sentences grouped per inference call.">×1</span>
+            <span class="stat" id="statTTFA" title="Time to first audio">⏱ —</span>
+            <span class="stat" id="statRTF">RTF —</span>
+            <span class="stat" id="statBuf">buf —</span>
           </div>
         </div>
         <div class="buf-row">
@@ -340,11 +207,9 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
           <div class="buf-track"><div class="buf-fill ok" id="bufFill"></div></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ④ Output -->
   <div class="card" id="outCard" style="display:none">
     <div class="card-header">
       <span class="card-title">Output</span>
@@ -354,7 +219,6 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
       </div>
     </div>
     <div class="card-body">
-      <!-- Waveform canvas -->
       <div class="waveform-wrap" id="waveformWrap">
         <span class="waveform-idle" id="waveformIdle">waveform appears here</span>
         <canvas id="waveformCanvas" style="display:none"></canvas>
@@ -362,768 +226,821 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
       <audio id="player" controls></audio>
     </div>
   </div>
-
 </div>
 
-<!-- Worker source -->
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     WORKER SOURCE
+     Token-level streaming: the LM generates one token at a time via the
+     BaseStreamer hook. Every CHUNK_SIZE tokens we call the conditional_decoder
+     with a sliding context window (matching the Python generate_stream impl).
+     Audio deltas are posted to the main thread as they are ready.
+════════════════════════════════════════════════════════════════════════════ -->
 <script id="workerSrc" type="text/plain">
-import { ChatterboxModel, AutoProcessor, Tensor }
+// ── Chatterbox Worker ─────────────────────────────────────────────────────────
+// Streaming architecture mirrors the Python generate_stream() exactly:
+//
+//   Python:                          JavaScript:
+//   for chunk in inference_stream:   for each CHUNK_SIZE tokens:
+//     _process_token_buffer(chunk)     PTMGenerate(max_new_tokens=CHUNK_SIZE,
+//                                                  past_key_values=prev)
+//                                      ← webInferenceChain free here →
+//                                      session.run(conditional_decoder)
+//
+// The LM and vocoder STRICTLY ALTERNATE — never concurrent.
+// No webInferenceChain contention. No GPU/CPU tensor confusion.
+
+import { ChatterboxModel, AutoProcessor, Tensor, DynamicCache, cat, full, ones }
   from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0/dist/transformers.min.js';
 
 const MODEL_ID    = 'ResembleAI/chatterbox-turbo-ONNX';
 const SAMPLE_RATE = 24000;
 
+const CHUNK_SIZE     = 25;   // LM tokens per iteration (= Python chunk_size default)
+
+const SILENCE_TOKEN      = 4299n;
+const START_SPEECH_TOKEN = 6561n;
+const STOP_SPEECH_TOKEN  = 6562n;
+
 let model = null, processor = null, spkEmbed = null;
+let _abortRequested = false;
 
 self.onmessage = async ({ data: msg }) => {
   try {
     if      (msg.type === 'load')    await load(msg.device, msg.hasF16, msg.forceFp32, msg.gpuMode);
     else if (msg.type === 'encode')  await encode(msg.audioData);
-    else if (msg.type === 'gen_one') await genOne(msg.text, msg.exaggeration, msg.maxNewTokens);
+    else if (msg.type === 'gen_one') await genOne(msg.text, msg.exaggeration, msg.maxNewTokens, msg.addSilence ?? false);
+    else if (msg.type === 'abort')   { _abortRequested = true; }
   } catch (err) {
-    emit('error', { message: String(err?.message ?? err) });
+    const raw = String(err?.message ?? err);
+    emit('error', { message: raw,
+      isOOM: raw.includes('bad_alloc') || raw.includes('ERROR_CODE: 6') || raw.includes('out of memory') });
   }
 };
 
-function emit(type, data, transfer) {
-  self.postMessage({ type, data }, transfer ?? []);
+function emit(type, data, xfer) { self.postMessage({ type, data }, xfer ?? []); }
+
+// ── toCPU ─────────────────────────────────────────────────────────────────────
+// Downloads a GPU-resident ORT tensor to a new CPU-resident Tensor.
+// Called once in encode() so spkEmbed is always CPU-safe for the WASM decoder.
+async function toCPU(tensor) {
+  const cpuData = await tensor.ort_tensor.getData(false);
+  const copy = cpuData instanceof BigInt64Array
+    ? BigInt64Array.from(cpuData)
+    : cpuData.slice();
+  return new Tensor(tensor.type, copy, [...tensor.dims]);
 }
 
+// ── decodeFull ────────────────────────────────────────────────────────────────
+// Decodes ALL tokens generated so far (prefix + every speech token).
+// Called after PTMGenerate() returns — webInferenceChain is idle.
+//
+// The vocoder is deterministic: decode(toks[0..N]) always returns the same
+// waveform regardless of what came before.  We exploit this to avoid all
+// boundary estimation:
+//   chunk 1: decode(toks[0..25])  → wav[0..L1],   emit wav[0..L1]
+//   chunk 2: decode(toks[0..50])  → wav[0..L2],   emit wav[L1..L2]   (delta)
+//   chunk 3: decode(toks[0..75])  → wav[0..L3],   emit wav[L2..L3]   (delta)
+//
+// Because the same input always produces the same output, wav[0..L1] in chunk 2
+// is bit-for-bit identical to chunk 1's output.  The delta wav[L1..L2] is
+// therefore perfectly contiguous — zero gap, zero overlap, zero stutter.
+async function decodeFull(allToks, addSilence) {
+  const data = BigInt64Array.from(allToks);
+  let t = cat([
+    spkEmbed.audio_tokens,
+    new Tensor('int64', data, [1, data.length]),
+  ], 1);
+  // Only append silence on the very last chunk of the very last sentence.
+  // Appending silence between sentences causes a vocoder artefact (brief glitch)
+  // because the neural decoder generates a transition artefact when going from
+  // speech tokens to silence tokens mid-generation. Between sentences the Web
+  // Audio scheduler handles continuity cleanly via nextStart scheduling.
+  if (addSilence) t = cat([t, full([1, 3], SILENCE_TOKEN)], 1);
+
+  const session = model.sessions['conditional_decoder'];
+  const src = {
+    speech_tokens:      t,
+    speaker_features:   spkEmbed.speaker_features,
+    speaker_embeddings: spkEmbed.speaker_embeddings,
+  };
+  const feed = {};
+  for (const name of session.inputNames) if (src[name]) feed[name] = src[name].ort_tensor;
+  const out = await session.run(feed);
+  const raw = out['waveform'].data;
+  return raw instanceof Float32Array ? raw : new Float32Array(raw);
+}
+
+// ── load ──────────────────────────────────────────────────────────────────────
 async function load(device, hasF16, forceFp32, gpuMode = 'full') {
+  _abortRequested = false;
+  if (model)     { try { await model.dispose?.();     } catch(_){} model = null; }
+  if (processor) { try { await processor.dispose?.(); } catch(_){} processor = null; }
+  spkEmbed = null;
+
   emit('status', { text: 'Loading processor…', cls: 'warn' });
-  processor = await AutoProcessor.from_pretrained(MODEL_ID, {
-    progress_callback: (p) => emit('dl_progress', p),
-  });
+  processor = await AutoProcessor.from_pretrained(MODEL_ID, { progress_callback: p => emit('dl_progress', p) });
   emit('status', { text: 'Loading model weights…', cls: 'warn' });
 
   const lmDtype = (device === 'webgpu' && hasF16 && !forceFp32) ? 'q4f16' : 'fp32';
-
   let sessionDevice, dtype;
   if (device === 'webgpu' && gpuMode === 'full') {
     sessionDevice = 'webgpu';
-    dtype = { embed_tokens: 'fp32', speech_encoder: 'fp32',
-              language_model: lmDtype, conditional_decoder: 'fp32' };
+    dtype = { embed_tokens:'fp32', speech_encoder:'fp32', language_model:lmDtype, conditional_decoder:'fp32' };
   } else if (device === 'webgpu' && gpuMode === 'hybrid') {
-    sessionDevice = { embed_tokens: 'wasm', speech_encoder: 'wasm',
-                      language_model: 'webgpu', conditional_decoder: 'wasm' };
-    dtype = { embed_tokens: 'fp32', speech_encoder: 'fp32',
-              language_model: lmDtype, conditional_decoder: 'fp32' };
+    sessionDevice = { embed_tokens:'wasm', speech_encoder:'wasm', language_model:'webgpu', conditional_decoder:'wasm' };
+    dtype = { embed_tokens:'fp32', speech_encoder:'fp32', language_model:lmDtype, conditional_decoder:'fp32' };
   } else {
     sessionDevice = 'wasm';
-    dtype = { embed_tokens: 'fp32', speech_encoder: 'fp32',
-              language_model: 'fp32', conditional_decoder: 'fp32' };
+    dtype = { embed_tokens:'fp32', speech_encoder:'fp32', language_model:'fp32', conditional_decoder:'fp32' };
   }
 
   model = await ChatterboxModel.from_pretrained(MODEL_ID, {
     device: sessionDevice, dtype,
-    progress_callback: (p) => emit('dl_progress', p),
+    progress_callback: p => emit('dl_progress', p),
   });
+  console.log(`[worker] loaded — device: ${JSON.stringify(sessionDevice)}, lmDtype: ${lmDtype}`);
+
+  // Warm up WebGPU shader compilation by running a generate loop that matches
+  // the exact call patterns of real generation:
+  //   - iteration 1: prefill (full prompt + audio features)
+  //   - iteration 2: continuation (single token + past_key_values)
+  //   - decoder call matching real token count
+  //
+  // Different input shapes → different WebGPU pipelines → different compilations.
+  // We must exercise both the prefill and continuation paths.
+  try {
+    emit('status', { text: 'Warming up GPU shaders…', cls: 'warn' });
+
+    const dummyAudio  = new Float32Array(SAMPLE_RATE);  // 1s of silence
+    const dummySpk    = await model.encode_speech(
+      new Tensor('float32', dummyAudio, [1, dummyAudio.length])
+    );
+    const dummyInputs = await processor('Warm up.');
+    const PTMGenerate = Object.getPrototypeOf(
+      Object.getPrototypeOf(ChatterboxModel.prototype)
+    ).generate;
+
+    // Iteration 1: prefill — compiles the full-context LM pipeline
+    const r1 = await PTMGenerate.call(model, {
+      ...dummyInputs,
+      ...dummySpk,
+      exaggeration:            0.5,
+      max_new_tokens:          CHUNK_SIZE,
+      return_dict_in_generate: true,
+    });
+
+    // Iteration 2: continuation — compiles the single-token KV-cache pipeline
+    const seqList = r1.sequences.tolist()[0];
+    const lastTok = seqList[seqList.length - 1];
+    await PTMGenerate.call(model, {
+      input_ids:               new Tensor('int64', [lastTok], [1, 1]),
+      exaggeration:            0.5,
+      max_new_tokens:          CHUNK_SIZE,
+      return_dict_in_generate: false,
+      past_key_values:         r1.past_key_values,
+    });
+    if (r1.past_key_values) try { await r1.past_key_values.dispose?.(); } catch(_) {}
+    console.log('[worker] LM warmup done');
+
+    // Decoder warmup — run with a realistic token count (CHUNK_SIZE + prefix)
+    try {
+      const dummySpkCPU = {
+        audio_tokens:       await toCPU(dummySpk.audio_tokens),
+        speaker_embeddings: await toCPU(dummySpk.speaker_embeddings),
+        speaker_features:   await toCPU(dummySpk.speaker_features),
+      };
+      // Use CHUNK_SIZE tokens to match the first real decoder call
+      const fakeToks = BigInt64Array.from(Array.from({length: CHUNK_SIZE}, (_, i) => BigInt(4300 + i)));
+      const dummyT   = cat([dummySpkCPU.audio_tokens, new Tensor('int64', fakeToks, [1, CHUNK_SIZE])], 1);
+      const session  = model.sessions['conditional_decoder'];
+      const feed     = {};
+      const src      = { speech_tokens: dummyT, speaker_features: dummySpkCPU.speaker_features, speaker_embeddings: dummySpkCPU.speaker_embeddings };
+      for (const name of session.inputNames) if (src[name]) feed[name] = src[name].ort_tensor;
+      await session.run(feed);
+      console.log('[worker] decoder warmup done');
+    } catch(e2) {
+      console.log('[worker] decoder warmup skipped:', e2.message);
+    }
+
+    console.log('[worker] warmup complete');
+  } catch(e) {
+    console.log('[worker] warmup skipped:', e.message);
+  }
+
   emit('loaded', { device, hasF16, lmDtype });
 }
 
+// ── encode ────────────────────────────────────────────────────────────────────
 async function encode(audioData) {
   emit('status', { text: 'Encoding speaker embedding…', cls: 'warn' });
-  const audio  = new Float32Array(audioData);
-  const tensor = new Tensor('float32', audio, [1, audio.length]);
-  spkEmbed = await model.encode_speech(tensor);
+  const audio = new Float32Array(audioData);
+  const raw   = await model.encode_speech(new Tensor('float32', audio, [1, audio.length]));
+
+  // Snapshot to CPU — on WebGPU these may be GPU-resident.
+  // The conditional_decoder runs on WASM and needs CPU ORT tensors.
+  spkEmbed = {
+    audio_tokens:       await toCPU(raw.audio_tokens),
+    speaker_embeddings: await toCPU(raw.speaker_embeddings),
+    speaker_features:   await toCPU(raw.speaker_features),
+    audio_features:     raw.audio_features,  // stays GPU for the LM forward()
+  };
+
+  console.log(`[worker] encoded — audio_tokens: [${spkEmbed.audio_tokens.dims}]`);
   emit('encoded', {});
 }
 
-async function genOne(text, exaggeration, maxNewTokens) {
+// ── genOne ────────────────────────────────────────────────────────────────────
+// Mirrors Python generate_stream() + inference_stream() combined:
+//
+//   iteration 1: PTMGenerate(text, spkEmbed, max_new_tokens=CHUNK_SIZE, kv=null)
+//                → speech encoder runs ONCE, produces first CHUNK_SIZE tokens
+//                → returns { sequences, past_key_values, audio_tokens, ... }
+//
+//   decode chunk (webInferenceChain is FREE — PTMGenerate has returned)
+//   emit audio chunk to main thread
+//
+//   iteration 2: PTMGenerate(last_token, past_key_values=prev, max_new_tokens=CHUNK_SIZE)
+//                → speech encoder SKIPPED (past_key_values present, input_ids.dims[1]==1)
+//                → produces next CHUNK_SIZE tokens
+//
+//   decode chunk → emit → iterate until EOS or maxNewTokens
+async function genOne(text, exaggeration, maxNewTokens, addSilence = false) {
+  if (_abortRequested) { emit('gen_one_aborted', {}); return; }
+
   const inputs = await processor(text);
-  const args   = { ...inputs, exaggeration: exaggeration ?? 0.5,
-                   max_new_tokens: maxNewTokens ?? 600 };
-  if (spkEmbed) Object.assign(args, spkEmbed);
 
-  const waveform = await model.generate(args);
-  const floats   = waveform.data;
+  // We call PreTrainedModel.generate() — not ChatterboxModel.generate() which
+  // would block until all tokens are generated then decode everything at once.
+  const PTMGenerate = Object.getPrototypeOf(
+    Object.getPrototypeOf(ChatterboxModel.prototype)
+  ).generate;
 
-  let peak = 0;
-  for (let i = 0; i < floats.length; i++) { const a = Math.abs(floats[i]); if (a > peak) peak = a; }
-  console.log(`[worker] generate() → ${floats.length} samples | peak ${peak.toFixed(5)}`);
-  if (peak < 1e-4)
-    console.warn('[worker] Output appears silent — try enabling "Force fp32 LM" in the UI');
+  let pastKV         = null;   // DynamicCache carried across iterations
+  let allToks        = [];     // all speech tokens generated so far
+  let prevWavLen     = 0;      // sample count already sent (for delta slicing)
+  let totalGenerated = 0;
+  let firstChunkMs   = null;
+  let chunkIdx       = 0;
+  const t0           = performance.now();
 
-  const buf = floats.buffer.slice(floats.byteOffset, floats.byteOffset + floats.byteLength);
-  emit('gen_one_done', { waveform: buf, peak }, [buf]);
+  // On the first iteration we pass the full text + speaker inputs.
+  // On subsequent iterations we pass only the last generated token + past_key_values.
+  // The speech encoder is skipped on iterations > 1 because:
+  //   forward() checks: if past_key_values && input_ids.dims[1] === 1 → skip encoder
+  let nextInputs = {
+    ...inputs,
+    exaggeration:            exaggeration ?? 0.5,
+    ...(spkEmbed ?? {}),
+  };
+
+  while (totalGenerated < maxNewTokens) {
+    if (_abortRequested) break;
+
+    const remaining = maxNewTokens - totalGenerated;
+    const thisChunk = Math.min(CHUNK_SIZE, remaining);
+
+    // Pass past_key_values from the previous iteration so the LM continues
+    // from where it left off without re-encoding the prompt.
+    const callArgs = {
+      ...nextInputs,
+      max_new_tokens:          thisChunk,
+      return_dict_in_generate: true,
+      // Passing past_key_values keeps the cache alive (not disposed after generate)
+      ...(pastKV ? { past_key_values: pastKV } : {}),
+    };
+
+    const result = await PTMGenerate.call(model, callArgs);
+
+    // result.sequences shape: [1, prompt_len + tokens_so_far + thisChunk]
+    // Extract only the NEW tokens from this iteration
+    const seqList  = result.sequences.tolist()[0];   // bigint[]
+    // Find the new tokens: everything after START_SPEECH_TOKEN up to STOP_SPEECH_TOKEN
+    // On iteration 1: sequences = [prompt..., START_SPEECH, tok1..tokN]
+    // On iteration 2: sequences = [START_SPEECH, tok1..tokN] (just the new part)
+    const newToks = seqList
+      .filter(t => t !== START_SPEECH_TOKEN && t !== STOP_SPEECH_TOKEN)
+      .slice(-thisChunk);
+
+    const hitEOS = seqList.includes(STOP_SPEECH_TOKEN) ||
+                   seqList[seqList.length - 1] === STOP_SPEECH_TOKEN;
+
+    // Update state
+    pastKV         = result.past_key_values;
+    totalGenerated += newToks.length;
+    allToks         = allToks.concat(newToks);
+
+    // On the next iteration, continue from the last generated token.
+    // The speech encoder will be skipped because past_key_values is set and
+    // input_ids will have dims[1] === 1.
+    const lastTok = newToks[newToks.length - 1];
+    if (lastTok !== undefined) {
+      nextInputs = {
+        input_ids: new Tensor('int64', [lastTok], [1, 1]),
+        // No audio inputs — encoder is skipped when past_key_values present
+      };
+    }
+
+    // ── Decode (webInferenceChain is free here) ──────────────────────────────
+    // Decode ALL tokens from scratch — get the cumulative waveform.
+    // Emit only the NEW samples since last decode (the delta).
+    // Because the vocoder is deterministic, wav[0..prevLen] is identical to
+    // what we already sent, so wav[prevLen..] is perfectly contiguous.
+    const isFinal  = hitEOS || totalGenerated >= maxNewTokens;
+    // addSilence is controlled by the caller (genOne msg param) — only true
+    // when this is the absolute last sentence so the vocoder gets a clean tail.
+    // For mid-generation sentence endings we skip silence to avoid artefacts.
+    const fullWav  = await decodeFull(allToks, isFinal && addSilence);
+    const delta    = fullWav.slice(prevWavLen);
+
+    if (delta.length > 0) {
+      prevWavLen = fullWav.length;
+      chunkIdx++;
+      if (firstChunkMs === null) {
+        firstChunkMs = performance.now() - t0;
+        console.log(`[worker] ⏱ first audio: ${firstChunkMs.toFixed(0)}ms`);
+      }
+      const buf = delta.buffer.slice(delta.byteOffset, delta.byteOffset + delta.byteLength);
+      emit('generate:chunk', {
+        chunk: buf, final: isFinal, chunkIndex: chunkIdx,
+        firstChunkMs: chunkIdx === 1 ? firstChunkMs : null,
+      }, [buf]);
+    }
+
+    if (isFinal) break;
+  }
+
+  // Release the KV cache
+  if (pastKV) try { await pastKV.dispose?.(); } catch(_) {}
+
+  emit('gen_one_done', {});
 }
 </script>
 
+
+
 <script type="module">
 const SAMPLE_RATE = 24000;
-const MAX_REF_S   = 10;
 
-// ── Boot worker ───────────────────────────────────────────────────────────────
-const workerSrc = document.getElementById('workerSrc').textContent;
-const worker = new Worker(
-  URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' })),
-  { type: 'module' }
+// ── Worker ───────────────────────────────────────────────────────────────────
+const workerBlob = URL.createObjectURL(
+  new Blob([document.getElementById('workerSrc').textContent], { type: 'text/javascript' })
 );
+let worker = null;
 
-let _pendingGenResolve = null;
-let _pendingGenReject  = null;
+function spawnWorker() {
+  const w = new Worker(workerBlob, { type: 'module' });
+  w.onmessage = onWorkerMessage;
+  return w;
+}
+function respawnWorker() {
+  try { worker?.terminate(); } catch(_) {}
+  worker = spawnWorker();
+}
+worker = spawnWorker();
 
-function genOne(text, exaggeration, maxNewTokens = 600) {
-  return new Promise((resolve, reject) => {
-    _pendingGenResolve = resolve;
-    _pendingGenReject  = reject;
-    worker.postMessage({ type: 'gen_one', text, exaggeration, maxNewTokens });
+let _resolve = null, _reject = null;
+function genOne(text, exag, maxTok = 600, addSilence = false) {
+  return new Promise((res, rej) => {
+    _resolve = res; _reject = rej;
+    worker.postMessage({ type: 'gen_one', text, exaggeration: exag, maxNewTokens: maxTok, addSilence });
   });
 }
 
 // ── ChunkPlayer ───────────────────────────────────────────────────────────────
+// Schedules each incoming Float32Array chunk onto the Web Audio timeline
+// gaplessly. AudioContext is created on first use (inside a user gesture chain).
 class ChunkPlayer {
   constructor() {
-    this.ctx       = new AudioContext({ sampleRate: SAMPLE_RATE });
-    this.nextStart = 0;
-    this.buffers   = [];
+    this._ctx = null; this.nextStart = 0;
+    this.buffers = []; this._stopped = false;
+    this._chain = Promise.resolve(); // serialise add() calls
   }
-  async add(float32Array) {
-    this.buffers.push(float32Array.slice());
-    if (this.ctx.state === 'suspended') await this.ctx.resume();
-    const ab = this.ctx.createBuffer(1, float32Array.length, this.ctx.sampleRate);
-    ab.copyToChannel(float32Array, 0);
-    const src = this.ctx.createBufferSource();
-    src.buffer = ab;
-    src.connect(this.ctx.destination);
-    const t = Math.max(this.nextStart, this.ctx.currentTime + 0.02);
+  get ctx() {
+    if (!this._ctx)
+      this._ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SAMPLE_RATE });
+    return this._ctx;
+  }
+  add(f32) {
+    // Chain add() calls so nextStart is always up-to-date
+    this._chain = this._chain.then(() => this._doAdd(f32));
+    return this._chain;
+  }
+  async _doAdd(f32) {
+    if (this._stopped || f32.length === 0) return;
+    this.buffers.push(f32.slice());
+    const ctx = this.ctx;
+    if (ctx.state === 'suspended') await ctx.resume();
+    const ab = ctx.createBuffer(1, f32.length, SAMPLE_RATE);
+    ab.copyToChannel(f32, 0);
+    const src = ctx.createBufferSource();
+    src.buffer = ab; src.connect(ctx.destination);
+    const now = ctx.currentTime;
+    // Resync if generation was slower than playback (nextStart drifted behind)
+    if (this.nextStart < now - 0.2) this.nextStart = now;
+    const t = Math.max(this.nextStart, now + 0.04); // 40ms lookahead
     src.start(t);
     this.nextStart = t + ab.duration;
   }
-  bufferDepth() { return Math.max(0, this.nextStart - this.ctx.currentTime); }
+  bufferDepth() { return Math.max(0, this.nextStart - (this._ctx?.currentTime ?? 0)); }
+  stop() { this._stopped = true; this._ctx?.suspend().catch(() => {}); }
   combined() {
-    const total = this.buffers.reduce((s, b) => s + b.length, 0);
-    const out   = new Float32Array(total);
-    let off = 0;
+    const n = this.buffers.reduce((s, b) => s + b.length, 0);
+    const out = new Float32Array(n); let off = 0;
     for (const b of this.buffers) { out.set(b, off); off += b.length; }
     return out;
   }
 }
 
-function splitSentences(text) {
-  const norm  = text.trim().replace(/\s+/g, ' ');
-  const parts = norm.match(/[^.!?]+[.!?]*\s*/g)?.map(s => s.trim()).filter(Boolean);
-  return (parts && parts.length > 0) ? parts : [norm];
-}
+let _cp = null, _stopReq = false;
 
-// ── Adaptive streaming ────────────────────────────────────────────────────────
-const BUF_LOW     = 0.4;
-const BUF_HIGH    = 3.0;
-const BUF_MAX_VIZ = 6.0;
-
-async function runGeneration(text, exaggeration) {
+// ── runGeneration ─────────────────────────────────────────────────────────────
+async function runGeneration(text, exag) {
   const maxTok = parseInt($('maxTokens').value) || 600;
-  const sentences = splitSentences(text);
-  const cp        = new ChunkPlayer();
-  let rtfEMA      = null;
+  _cp = new ChunkPlayer();
+  _stopReq = false;
+  const t0 = performance.now();
 
-  ckWrap.style.display  = 'flex';
-  ckFill.style.width    = '0%';
+  ckWrap.style.display = 'flex';
+  ckFill.style.width   = '0%';
   outCard.style.display = 'none';
-  updateRTF(null); updateBuffer(0); updateBatch(1);
+  ckLabel.innerHTML = `<span class="dot"></span>Streaming…`;
+  updateRTF(null); updateBuf(0);
+  btnStop.style.display = 'inline-block'; btnStop.disabled = false;
+  btnGen.disabled = true;
 
-  ckLabel.textContent = 'Generating first sentence…';
-  {
-    const t0     = performance.now();
-    const floats = await genOne(sentences[0], exaggeration, maxTok);
-    const genSec = (performance.now() - t0) / 1000;
-    const audSec = floats.length / SAMPLE_RATE;
-    rtfEMA = genSec / audSec;
-    await cp.add(floats);
-    ckFill.style.width = `${(1 / sentences.length * 100).toFixed(0)}%`;
-    updateRTF(rtfEMA);
-    updateBuffer(cp.bufferDepth());
+  // Split on sentence boundaries so LM context stays manageable
+  const sentences = splitSentences(text);
+  const N = sentences.length;
+
+  for (let i = 0; i < N; i++) {
+    if (_stopReq) throw new DOMException('Stopped', 'AbortError');
+    if (N > 1) ckLabel.innerHTML = `<span class="dot"></span>Sentence ${i+1} / ${N}`;
+    await genOne(sentences[i], exag, maxTok, /* addSilence= */ i === N - 1);
+    // gen_one_done fires only after all chunks are posted
+    ckFill.style.width = `${((i+1)/N*100).toFixed(0)}%`;
+    updateBuf(_cp.bufferDepth());
   }
 
-  const remaining = sentences.slice(1);
+  // Brief settle so last postMessages land before we read combined()
+  await new Promise(r => setTimeout(r, 80));
 
-  if (remaining.length === 0) {
-    // single sentence — done
+  const combined = _cp.combined();
+  const totalSec = (combined.length / SAMPLE_RATE).toFixed(1);
+  const rtf      = ((performance.now() - t0) / 1000) / parseFloat(totalSec);
 
-  } else if (rtfEMA >= 1.0) {
-    const n = remaining.length;
-    chip(loadChip,
-      `Generation is slower than real-time (RTF ${rtfEMA.toFixed(2)}×) — switching to full-chunk mode. Audio will play once everything is ready.`,
-      'warn');
-    ckLabel.innerHTML = `Buffering — RTF ${rtfEMA.toFixed(2)}× · generating ${n} remaining sentence${n !== 1 ? 's' : ''}…`;
-    updateBatch(n);
-    const t0     = performance.now();
-    const floats = await genOne(remaining.join(' '), exaggeration, Math.min(2048, n * 300));
-    const genSec = (performance.now() - t0) / 1000;
-    const audSec = floats.length / SAMPLE_RATE;
-    rtfEMA = 0.6 * rtfEMA + 0.4 * (genSec / audSec);
-    await cp.add(floats);
-    ckFill.style.width = '100%';
-    updateRTF(rtfEMA);
-    updateBuffer(cp.bufferDepth());
-
-  } else {
-    let batchSize = 1, sentIdx = 0;
-    while (sentIdx < remaining.length) {
-      const batchEnd  = Math.min(sentIdx + batchSize, remaining.length);
-      const batchText = remaining.slice(sentIdx, batchEnd).join(' ');
-      const doneSent  = 1 + batchEnd;
-      ckLabel.innerHTML = `<span class="dot"></span>Streaming — sentence ${doneSent} / ${sentences.length}`;
-      updateBatch(batchSize);
-      const t0     = performance.now();
-      const floats = await genOne(batchText, exaggeration, maxTok);
-      const genSec = (performance.now() - t0) / 1000;
-      const audSec = floats.length / SAMPLE_RATE;
-      rtfEMA = 0.6 * rtfEMA + 0.4 * (genSec / audSec);
-      await cp.add(floats);
-      const bufDep = cp.bufferDepth();
-      if (bufDep < BUF_LOW  && batchSize < 4) batchSize++;
-      if (bufDep > BUF_HIGH && batchSize > 1) batchSize--;
-      sentIdx = batchEnd;
-      ckFill.style.width = `${((1 + sentIdx) / sentences.length * 100).toFixed(0)}%`;
-      updateRTF(rtfEMA);
-      updateBuffer(bufDep);
-    }
-  }
-
-  const combined  = cp.combined();
-  const totalSec  = (combined.length / SAMPLE_RATE).toFixed(1);
-  const mode      = rtfEMA >= 1.0 ? 'buffered' : 'streamed';
-  ckLabel.textContent = `✓ Done (${mode}) — ${totalSec}s · RTF ${rtfEMA.toFixed(2)}×`;
+  ckLabel.textContent = `✓ Done — ${totalSec}s · RTF ${rtf.toFixed(2)}×`;
   ckFill.style.width  = '100%';
-  updateBuffer(0);
+  updateRTF(rtf); updateBuf(0);
 
-  // Build audio blob & WAV URL
   const blob = new Blob([encodeWAV(combined, SAMPLE_RATE)], { type: 'audio/wav' });
   player.src = URL.createObjectURL(blob);
   outCard.style.display = 'block';
-  $('genStats').textContent = `${totalSec}s · RTF ${rtfEMA.toFixed(2)}×`;
-
-  // Draw waveform
+  $('genStats').textContent = `${totalSec}s · RTF ${rtf.toFixed(2)}×`;
   drawWaveform(combined);
-
-  btnGen.disabled = false;
+  window._lastCP = _cp;
+  _cp = null;
+  resetUI();
   chip(loadChip, 'Model ready', 'ok');
-  window._lastPlayer = cp;
 }
 
-// ── DOM refs ──────────────────────────────────────────────────────────────────
+function splitSentences(text) {
+  const norm  = text.trim().replace(/\s+/g, ' ');
+  const parts = norm.match(/[^.!?]+[.!?]*\s*/g)?.map(s => s.trim()).filter(Boolean);
+  return parts?.length ? parts : [norm];
+}
+
+// ── DOM ───────────────────────────────────────────────────────────────────────
+// Use a live getter so these work regardless of when the module evaluates.
+// getElementById always returns the element (or null before parse, but the
+// <script type="module"> at body-end ensures the DOM is ready by eval time).
 const $ = id => document.getElementById(id);
-const loadChip = $('loadChip');
-const dlProg   = $('dlProg');
-const dlFill   = $('dlFill');
-const devBadge = $('devBadge');
-const btnLoad  = $('btnLoad');
-const btnGen   = $('btnGen');
-const txtInput = $('txtInput');
-const exag     = $('exag');
-const exagVal  = $('exagVal');
-const ckWrap   = $('ckWrap');
-const ckFill   = $('ckFill');
-const ckLabel  = $('ckLabel');
-const statRTF  = $('statRTF');
-const statBuf  = $('statBuf');
-const statBatch= $('statBatch');
-const bufFill  = $('bufFill');
-const outCard  = $('outCard');
-const player   = $('player');
-const btnDl    = $('btnDl');
+let loadChip, dlProg, dlFill, devBadge, btnLoad, btnGen, btnStop;
+let exag, exagVal, ckWrap, ckFill, ckLabel;
+let statRTF, statBuf, statTTFA, bufFill, outCard, player, btnDl;
 
-function chip(el, html, cls = '') {
-  el.innerHTML     = html;
-  el.className     = 'chip' + (cls ? ' ' + cls : '');
-  el.style.display = 'block';
+function initDOM() {
+  loadChip = $('loadChip'); dlProg = $('dlProg'); dlFill = $('dlFill');
+  devBadge = $('devBadge'); btnLoad = $('btnLoad'); btnGen = $('btnGen'); btnStop = $('btnStop');
+  exag = $('exag'); exagVal = $('exagVal');
+  ckWrap = $('ckWrap'); ckFill = $('ckFill'); ckLabel = $('ckLabel');
+  statRTF = $('statRTF'); statBuf = $('statBuf'); statTTFA = $('statTTFA'); bufFill = $('bufFill');
+  outCard = $('outCard'); player = $('player'); btnDl = $('btnDl');
 }
+// Module scripts run after HTML is parsed (they're deferred by spec), so the
+// DOM is ready immediately — but call initDOM() explicitly to be safe.
+initDOM();
+
+const BUF_MAX = 6.0, BUF_LOW = 0.4;
+
+function chip(el, html, cls='') { el.innerHTML=html; el.className='chip'+(cls?' '+cls:''); }
 function updateRTF(rtf) {
-  if (rtf === null) { statRTF.textContent = 'RTF —'; statRTF.className = 'stat'; return; }
-  const cls = rtf < 0.9 ? 'ok' : rtf < 1.1 ? 'warn' : 'err';
-  statRTF.textContent = `RTF ${rtf.toFixed(2)}×`;
-  statRTF.className   = `stat ${cls}`;
+  if (rtf===null){statRTF.textContent='RTF —';statRTF.className='stat';return;}
+  const c=rtf<0.9?'ok':rtf<1.1?'warn':'err';
+  statRTF.textContent=`RTF ${rtf.toFixed(2)}×`;statRTF.className=`stat ${c}`;
 }
-function updateBuffer(depthSec) {
-  const pct = Math.min(100, depthSec / BUF_MAX_VIZ * 100).toFixed(0);
-  bufFill.style.width = pct + '%';
-  const cls = depthSec > BUF_LOW ? 'ok' : depthSec > 0.1 ? 'warn' : 'err';
-  bufFill.className   = `buf-fill ${cls}`;
-  statBuf.textContent = `buf ${depthSec.toFixed(1)}s`;
-  statBuf.className   = `stat ${cls}`;
+function updateBuf(s) {
+  bufFill.style.width=Math.min(100,s/BUF_MAX*100).toFixed(0)+'%';
+  const c=s>BUF_LOW?'ok':s>0.1?'warn':'err';
+  bufFill.className=`buf-fill ${c}`;statBuf.textContent=`buf ${s.toFixed(1)}s`;statBuf.className=`stat ${c}`;
 }
-function updateBatch(n) { statBatch.textContent = `×${n}`; }
-
-// EP chip helpers
-function setEP(id, active) {
-  $(`ep-${id}`).className = `ep-chip${active ? ' active' : ''}`;
+function setEP(id,on){$(`ep-${id}`).className=`ep-chip${on?' active':''}`;}
+function resetUI(){
+  if(btnGen) btnGen.disabled=false;
+  if(btnStop){btnStop.disabled=true;btnStop.style.display='none';}
+  if(statTTFA){statTTFA.textContent='⏱ —';statTTFA.className='stat';}
+}
+function updateTTFA(ms) {
+  const s = (ms/1000).toFixed(2);
+  const cls = ms < 500 ? 'ok' : ms < 1500 ? 'warn' : 'err';
+  statTTFA.textContent = `⏱ ${s}s`;
+  statTTFA.className = `stat ${cls}`;
 }
 
 // ── Worker messages ───────────────────────────────────────────────────────────
-// Track overall download progress across all files
-let _totalLoaded = 0, _totalSize = 0, _fileSizes = {};
-
-worker.onmessage = ({ data: msg }) => {
+let _dlFiles = {}, _dlLoaded = {};
+function onWorkerMessage({ data: msg }) {
   switch (msg.type) {
-
-    case 'status':
-      chip(loadChip, msg.data.text, msg.data.cls);
-      break;
+    case 'status': chip(loadChip, msg.data.text, msg.data.cls); break;
 
     case 'dl_progress': {
       const p = msg.data;
-      if (p.status === 'progress' && p.total && p.file) {
-        // Track per-file totals for a true overall progress
-        const prev = _fileSizes[p.file] ?? 0;
-        _fileSizes[p.file] = p.total;
-        _totalSize   = Object.values(_fileSizes).reduce((a, b) => a + b, 0);
-        // Update loaded: replace per-file contribution
-        const prevLoaded = _fileLoaded?.[p.file] ?? 0;
-        _totalLoaded = (_totalLoaded - prevLoaded) + p.loaded;
-        if (!window._fileLoaded) window._fileLoaded = {};
-        window._fileLoaded[p.file] = p.loaded;
-
-        const overallPct = _totalSize > 0
-          ? Math.min(99, (_totalLoaded / _totalSize * 100)).toFixed(1)
-          : null;
-
-        dlProg.style.display = 'flex';
-        if (overallPct !== null) {
-          dlFill.style.width = overallPct + '%';
-          $('dlPct').textContent = overallPct + '%';
-        }
-        const shortFile = p.file.split('/').pop();
-        $('dlFile').textContent = shortFile;
-      } else if (p.status === 'done') {
-        if (p.file && window._fileLoaded) {
-          _totalLoaded = (_totalLoaded - (window._fileLoaded[p.file] ?? 0)) + (_fileSizes[p.file] ?? 0);
-          window._fileLoaded[p.file] = _fileSizes[p.file] ?? 0;
-        }
-        $('dlFile').textContent = `✓ ${p.file?.split('/').pop() ?? ''}`;
+      if (p.status==='progress' && p.total && p.file) {
+        _dlFiles[p.file]  = p.total;
+        _dlLoaded[p.file] = p.loaded;
+        const tot = Object.values(_dlFiles).reduce((a,b)=>a+b,0);
+        const lod = Object.values(_dlLoaded).reduce((a,b)=>a+b,0);
+        dlProg.style.display='flex';
+        dlFill.style.width=Math.min(99,lod/tot*100).toFixed(1)+'%';
+        $('dlPct').textContent=Math.min(99,lod/tot*100).toFixed(1)+'%';
+        $('dlFile').textContent=p.file.split('/').pop();
+      } else if (p.status==='done') {
+        $('dlFile').textContent=`✓ ${p.file?.split('/').pop()??''}`;
       }
       break;
     }
 
     case 'loaded': {
-      const { device: dev, hasF16, lmDtype } = msg.data;
-      dlProg.style.display = 'none';
-      // Update EP chips
-      setEP('webgpu', dev === 'webgpu');
-      setEP('wasm', true); // always available
-      setEP('f16', hasF16);
-      const dtypeLabel = dev === 'webgpu'
-        ? ` · ${lmDtype}${hasF16 ? '' : ' (no f16)'}` : ' · fp32/wasm';
-      chip(loadChip, `Model ready — ${dev.toUpperCase()}${dtypeLabel}`, 'ok');
-      devBadge.textContent   = dev.toUpperCase();
-      devBadge.className     = `badge ${dev}`;
-      devBadge.style.display = 'inline-block';
-      btnLoad.disabled = true;
-      btnGen.disabled  = true;   // stays disabled until voice is encoded
-      $('btnEncode').disabled = false;
-      chip(loadChip, `Model ready — encode a reference voice to generate`, 'ok');
+      const {device:dev,hasF16,lmDtype} = msg.data;
+      dlProg.style.display='none';
+      setEP('webgpu',dev==='webgpu'); setEP('wasm',true); setEP('f16',hasF16);
+      devBadge.textContent=dev.toUpperCase();
+      devBadge.className=`badge ${dev}`; devBadge.style.display='inline-block';
+      btnLoad.disabled=true; btnGen.disabled=true;
+      $('btnEncode').disabled=false;
+      chip(loadChip,`Model ready — encode a reference voice to generate`,'ok');
       break;
     }
 
     case 'encoded':
-      $('vcStatus').textContent = '✓ ready';
-      $('vcStatus').style.color = 'var(--green)';
-      $('vcEncodeStatus').textContent = '✓ encoded';
-      $('vcEncodeStatus').style.color = 'var(--green)';
-      btnGen.disabled = false;
-      chip(loadChip, `Model ready — ${$('devBadge').textContent}`, 'ok');
+      $('vcStatus').textContent='✓ ready'; $('vcStatus').style.color='var(--green)';
+      $('vcEncodeStatus').textContent='✓ encoded'; $('vcEncodeStatus').style.color='var(--green)';
+      btnGen.disabled=false;
+      chip(loadChip,`Model ready — ${$('devBadge').textContent}`,'ok');
       break;
 
-    case 'gen_one_done': {
-      const floats = new Float32Array(msg.data.waveform);
-      if (msg.data.peak < 1e-4) {
-        chip(loadChip,
-          'Silent output (peak < 0.0001) — enable "Force fp32 LM" and reload model', 'err');
+    // ── PCM chunk arrives while LM is still running ───────────────────────
+    case 'generate:chunk': {
+      const { chunk, firstChunkMs, chunkIndex } = msg.data;
+      const f32 = new Float32Array(chunk);
+      if (_cp && f32.length > 0) {
+        _cp.add(f32);
+        updateBuf(_cp.bufferDepth());
+        // Display time-to-first-audio on the first chunk only
+        if (firstChunkMs != null) {
+          updateTTFA(firstChunkMs);
+          console.log(`[main] ⏱ first audio chunk (#${chunkIndex}): ${firstChunkMs.toFixed(0)}ms`);
+        }
       }
-      _pendingGenResolve?.(floats);
-      _pendingGenResolve = null;
-      _pendingGenReject  = null;
       break;
     }
 
+    case 'gen_one_done':
+    case 'gen_one_aborted':
+      _resolve?.(); _resolve=null; _reject=null;
+      break;
+
     case 'error': {
-      _pendingGenReject?.(new Error(msg.data.message));
-      _pendingGenResolve = null;
-      _pendingGenReject  = null;
-      chip(loadChip, 'Error: ' + msg.data.message, 'err');
-      ckWrap.style.display = 'none';
-      btnLoad.disabled = false;
-      btnGen.disabled  = false;
+      const raw=msg.data.message??'Unknown error';
+      _reject?.(new Error(raw)); _resolve=null; _reject=null;
+      if (msg.data.isOOM) {
+        respawnWorker();
+        chip(loadChip,
+          '⚠ Out of memory — model weights exceed available RAM/VRAM.<br>'+
+          'Try: <b>1)</b> WASM backend &nbsp;<b>2)</b> Force fp32 LM &nbsp;<b>3)</b> Close other tabs.','err');
+        btnLoad.disabled=false;
+      } else {
+        chip(loadChip,'Error: '+raw,'err'); btnLoad.disabled=false;
+      }
+      ckWrap.style.display='none'; resetUI();
       break;
     }
   }
-};
+}
 
 // ── GPU detection ─────────────────────────────────────────────────────────────
 async function detectGPU() {
-  if (!navigator.gpu) return { device: 'wasm', hasF16: false };
-  let adapter =
-    await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' }).catch(() => null)
-    ?? await navigator.gpu.requestAdapter().catch(() => null);
-  if (!adapter) return { device: 'wasm', hasF16: false };
+  if (!navigator.gpu) return { device:'wasm', hasF16:false };
+  const adapter = await navigator.gpu.requestAdapter({ powerPreference:'high-performance' }).catch(()=>null)
+               ?? await navigator.gpu.requestAdapter().catch(()=>null);
+  if (!adapter) return { device:'wasm', hasF16:false };
   const hasF16 = adapter.features.has('shader-f16');
-
-  // Populate GPU info row
   try {
-    const info = await (adapter.info ?? (adapter.requestAdapterInfo?.() ?? {}));
-    const vendor = info.vendor || '?';
-    const device = info.device || info.description || info.architecture || '?';
-    const f16cls = hasF16 ? 'gpu-good' : 'gpu-warn_';
-    const f16txt = hasF16 ? '✓ yes' : '✗ no';
-    $('gpuInfoRow').style.display = 'block';
-    $('gpuInfoRow').innerHTML =
-      `<span class="gpu-key">GPU:</span> <span class="gpu-val">${vendor} — ${device}</span>` +
-      `&nbsp; <span class="gpu-key">shader-f16:</span> <span class="${f16cls}">${f16txt}</span>`;
-  } catch(_) {}
-
-  return { device: 'webgpu', hasF16 };
+    const info = await (adapter.info ?? adapter.requestAdapterInfo?.() ?? {});
+    const f=hasF16?'gpu-good':'gpu-warn_';
+    $('gpuInfoRow').style.display='block';
+    $('gpuInfoRow').innerHTML=`<span class="gpu-key">GPU:</span> <span class="gpu-val">${info.vendor??'?'} — ${info.device??info.description??'?'}</span>&nbsp;<span class="gpu-key">shader-f16:</span> <span class="${f}">${hasF16?'✓ yes':'✗ no'}</span>`;
+  } catch(_){}
+  return { device:'webgpu', hasF16 };
 }
 
-// ── Backend selector ──────────────────────────────────────────────────────────
 $('selMode').addEventListener('change', () => {
-  const isGPU = $('selMode').value !== 'wasm';
-  $('fp32Row').style.display = isGPU ? 'flex' : 'none';
+  $('fp32Row').style.display = $('selMode').value !== 'wasm' ? 'flex' : 'none';
 });
-
-// Update EP chips immediately based on what's available in the browser
 (async () => {
-  setEP('wasm', true);
-  const hasGPU = !!navigator.gpu;
-  setEP('webgpu', hasGPU);
-  if (hasGPU) {
-    const adapter = await navigator.gpu.requestAdapter().catch(() => null);
-    if (adapter) setEP('f16', adapter.features.has('shader-f16'));
-  }
+  setEP('wasm',true);
+  if (navigator.gpu) { setEP('webgpu',true); const a=await navigator.gpu.requestAdapter().catch(()=>null); if(a) setEP('f16',a.features.has('shader-f16')); }
 })();
 
-// ── Load ──────────────────────────────────────────────────────────────────────
+// ── Load button ───────────────────────────────────────────────────────────────
 btnLoad.addEventListener('click', async () => {
-  btnLoad.disabled = true;
-  _totalLoaded = 0; _totalSize = 0; _fileSizes = {};
-  window._fileLoaded = {};
-
-  const gpuMode   = $('selMode').value;
-  const forceFp32 = $('chkFp32').checked;
-
-  let device = 'wasm', hasF16 = false;
+  btnLoad.disabled=true; _dlFiles={}; _dlLoaded={};
+  const gpuMode=($('selMode').value), forceFp32=$('chkFp32').checked;
+  let device='wasm', hasF16=false;
   if (gpuMode !== 'wasm') {
-    chip(loadChip, 'Checking WebGPU…', 'warn');
-    const gpu = await detectGPU();
-    if (gpu.device === 'wasm') {
-      chip(loadChip, 'No WebGPU available — falling back to WASM', 'warn');
-    } else {
-      device = gpu.device;
-      hasF16 = gpu.hasF16;
-    }
+    chip(loadChip,'Checking WebGPU…','warn');
+    const g = await detectGPU();
+    if (g.device==='webgpu') { device='webgpu'; hasF16=g.hasF16; }
+    else chip(loadChip,'No WebGPU — falling back to WASM','warn');
   }
-
-  const effectiveMode = device === 'webgpu' ? gpuMode : 'wasm';
-  const lmLabel  = (device === 'webgpu' && hasF16 && !forceFp32) ? 'q4f16' : 'fp32';
-  const sizeHint = lmLabel === 'q4f16' ? '~755 MB' : '~1.2 GB';
-  const hint = device === 'webgpu'
-    ? `WebGPU ${effectiveMode} · ${lmLabel} (${sizeHint})`
-    : `WASM fp32 (${sizeHint})`;
-  chip(loadChip, `${hint} · downloading…`, 'warn');
-  worker.postMessage({ type: 'load', device, hasF16, forceFp32, gpuMode: effectiveMode });
+  const eff = device==='webgpu' ? gpuMode : 'wasm';
+  const lm  = (device==='webgpu'&&hasF16&&!forceFp32)?'q4f16':'fp32';
+  chip(loadChip,`${device==='webgpu'?`WebGPU ${eff} · ${lm}`:'WASM fp32'} · downloading…`,'warn');
+  console.log(`[main] load device=${device} gpuMode=${eff} lmDtype=${lm} forceFp32=${forceFp32}`);
+  worker.postMessage({ type:'load', device, hasF16, forceFp32, gpuMode:eff });
 });
 
-// ── Reference voice: segment selector state ───────────────────────────────────
-let refAudioFull   = null;
-let refAudioDurSec = 0;
-let vcSegStart     = 0;
-const VC_SEG_LEN   = 10;
+// ── Generate + Stop ───────────────────────────────────────────────────────────
+btnGen.addEventListener('click', () => {
+  const text = $('txtInput').value.trim();
+  if (!text) return;
+  btnGen.disabled=true; updateRTF(null); updateBuf(0);
+  runGeneration(text, parseFloat(exag.value)).catch(err => {
+    if (err.name !== 'AbortError') { chip(loadChip,'Error: '+err.message,'err'); }
+    else ckLabel.textContent = '⏹ Stopped.';
+    resetUI();
+  });
+});
 
-async function loadAudioBuffer(arrayBuf, displayName) {
-  const statusEl = $('refAudioStatus');
-  statusEl.style.display = 'block';
-  statusEl.style.color   = 'var(--warn)';
-  statusEl.textContent   = 'Decoding…';
+btnStop.addEventListener('click', () => {
+  _stopReq = true;
+  worker.postMessage({ type:'abort' });
+  if (_cp) { _cp.stop(); _cp=null; }
+  if (_reject) { _reject(new DOMException('Stopped','AbortError')); _resolve=null; _reject=null; }
+  ckLabel.textContent='⏹ Stopping…';
+  resetUI();
+});
 
-  const audioCtx = new AudioContext({ sampleRate: SAMPLE_RATE });
-  const decoded  = await audioCtx.decodeAudioData(arrayBuf);
-  audioCtx.close();
+exag.addEventListener('input', () => { exagVal.textContent=parseFloat(exag.value).toFixed(2); });
 
-  let raw = decoded.getChannelData(0);
-  if (decoded.sampleRate !== SAMPLE_RATE) {
-    const ratio = decoded.sampleRate / SAMPLE_RATE;
-    const out   = new Float32Array(Math.round(raw.length / ratio));
-    for (let i = 0; i < out.length; i++)
-      out[i] = raw[Math.min(Math.round(i * ratio), raw.length - 1)];
-    raw = out;
+// ── Reference voice ───────────────────────────────────────────────────────────
+let refAudioFull=null, refAudioDurSec=0, vcSegStart=0;
+const VC_SEG_LEN=10;
+
+async function loadAudioBuffer(buf, name) {
+  const s=$('refAudioStatus'); s.style.display='block'; s.style.color='var(--warn)'; s.textContent='Decoding…';
+  const ctx=new AudioContext({sampleRate:SAMPLE_RATE});
+  const dec=await ctx.decodeAudioData(buf); ctx.close();
+  let raw=dec.getChannelData(0);
+  if (dec.sampleRate!==SAMPLE_RATE) {
+    const r=dec.sampleRate/SAMPLE_RATE, o=new Float32Array(Math.round(raw.length/r));
+    for(let i=0;i<o.length;i++) o[i]=raw[Math.min(Math.round(i*r),raw.length-1)];
+    raw=o;
   }
-
-  refAudioFull   = raw;
-  refAudioDurSec = raw.length / SAMPLE_RATE;
-  vcSegStart     = 0;
-
-  statusEl.style.display = 'none';
-  $('vcFilename').textContent = displayName;
-  $('vcWaveWrap').style.display = 'flex';
-
-  drawVCWaveform();
-  updateVCSelection();
+  refAudioFull=raw; refAudioDurSec=raw.length/SAMPLE_RATE; vcSegStart=0;
+  s.style.display='none';
+  $('vcFilename').textContent=name; $('vcWaveWrap').style.display='flex';
+  drawVCWaveform(); updateVCSel();
 }
 
-window.onRefAudioFile = async function(input) {
-  const file = input.files[0];
-  if (!file) return;
-  try { await loadAudioBuffer(await file.arrayBuffer(), file.name); }
-  catch(e) {
-    const statusEl = $('refAudioStatus');
-    statusEl.style.display = 'block';
-    statusEl.style.color   = 'var(--err)';
-    statusEl.textContent   = `✗ ${e.message ?? String(e)}`;
-  }
+window.onRefAudioFile=async function(inp){
+  const f=inp.files[0]; if(!f) return;
+  try { await loadAudioBuffer(await f.arrayBuffer(),f.name); }
+  catch(e){ const s=$('refAudioStatus'); s.style.display='block'; s.style.color='var(--err)'; s.textContent='✗ '+e.message; }
 };
 
-
-
-function drawVCWaveform() {
-  const canvas = $('vcWaveCanvas');
-  const wrap   = $('vcWaveOuter');
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-  if (!refAudioFull) return;
-  const step  = Math.max(1, Math.floor(refAudioFull.length / W));
-  const mid   = H / 2, scale = mid * 0.85;
-  ctx.strokeStyle = '#3a3a5e';
-  ctx.lineWidth   = 1;
-  ctx.beginPath();
-  for (let x = 0; x < W; x++) {
-    const v = refAudioFull[x * step] ?? 0;
-    const y = mid - v * scale;
-    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  }
+function drawVCWaveform(){
+  const cv=$('vcWaveCanvas'),wr=$('vcWaveOuter'),W=wr.clientWidth,H=wr.clientHeight;
+  cv.width=W;cv.height=H;const ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);
+  if(!refAudioFull)return;const step=Math.max(1,Math.floor(refAudioFull.length/W)),mid=H/2,sc=mid*.85;
+  ctx.strokeStyle='#3a3a5e';ctx.lineWidth=1;ctx.beginPath();
+  for(let x=0;x<W;x++){const v=refAudioFull[x*step]??0;const y=mid-v*sc;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
   ctx.stroke();
 }
 
-function updateVCSelection() {
-  if (!refAudioFull) return;
-  const W      = $('vcWaveOuter').clientWidth;
-  const dur    = refAudioDurSec;
-  const segLen = Math.min(VC_SEG_LEN, dur);
-  vcSegStart   = Math.max(0, Math.min(vcSegStart, dur - segLen));
-  const xL = (vcSegStart / dur) * W;
-  const xR = ((vcSegStart + segLen) / dur) * W;
-  $('vcSelLeft').style.width   = xL + 'px';
-  $('vcSelRight').style.width  = (W - xR) + 'px';
-  $('vcSelBar').style.left     = xL + 'px';
-  $('vcSelBar').style.width    = (xR - xL) + 'px';
-  $('vcHandleL').style.left    = (xL - 5) + 'px';
-  $('vcHandleR').style.left    = (xR - 5) + 'px';
-  const endSec = Math.min(vcSegStart + segLen, dur);
-  $('vcSegmentLabel').textContent = `${vcSegStart.toFixed(1)}s – ${endSec.toFixed(1)}s`;
+function updateVCSel(){
+  if(!refAudioFull)return;
+  const W=$('vcWaveOuter').clientWidth,dur=refAudioDurSec,sl=Math.min(VC_SEG_LEN,dur);
+  vcSegStart=Math.max(0,Math.min(vcSegStart,dur-sl));
+  const xL=vcSegStart/dur*W,xR=(vcSegStart+sl)/dur*W;
+  $('vcSelLeft').style.width=xL+'px'; $('vcSelRight').style.width=(W-xR)+'px';
+  $('vcSelBar').style.left=xL+'px'; $('vcSelBar').style.width=(xR-xL)+'px';
+  $('vcHandleL').style.left=(xL-5)+'px'; $('vcHandleR').style.left=(xR-5)+'px';
+  $('vcSegmentLabel').textContent=`${vcSegStart.toFixed(1)}s – ${Math.min(vcSegStart+sl,dur).toFixed(1)}s`;
 }
 
-// Drag logic
-(function() {
-  let dragging = null, dragStartX = 0, dragStartSeg = 0;
-  function pxToSec(px) {
-    return (px / $('vcWaveOuter').clientWidth) * (refAudioDurSec || 1);
-  }
-  function onDown(e, mode) {
-    e.preventDefault();
-    dragging = mode;
-    dragStartX   = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
-    dragStartSeg = vcSegStart;
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup',   onUp);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend',  onUp);
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    e.preventDefault();
-    const cx     = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
-    const dSec   = pxToSec(cx - dragStartX);
-    const segLen = Math.min(VC_SEG_LEN, refAudioDurSec);
-    vcSegStart   = Math.max(0, Math.min(dragStartSeg + dSec, refAudioDurSec - segLen));
-    updateVCSelection();
-  }
-  function onUp() {
-    dragging = null;
-    window.removeEventListener('mousemove', onMove);
-    window.removeEventListener('mouseup',   onUp);
-    window.removeEventListener('touchmove', onMove);
-    window.removeEventListener('touchend',  onUp);
-  }
-  document.addEventListener('DOMContentLoaded', () => {
-    $('vcHandleL').addEventListener('mousedown',   e => onDown(e, 'L'));
-    $('vcHandleR').addEventListener('mousedown',   e => onDown(e, 'R'));
-    $('vcSelBar').addEventListener('mousedown',    e => onDown(e, 'bar'));
-    $('vcWaveOuter').addEventListener('mousedown', e => {
-      if (['vcWaveOuter','vcWaveCanvas','vcSelLeft','vcSelRight'].includes(e.target.id))
-        onDown(e, 'bar');
-    });
-    $('vcHandleL').addEventListener('touchstart', e => onDown(e, 'L'), { passive: false });
-    $('vcHandleR').addEventListener('touchstart', e => onDown(e, 'R'), { passive: false });
+(function(){
+  let drag=null,dx=0,ds=0;
+  function px2s(px){return px/$('vcWaveOuter').clientWidth*(refAudioDurSec||1);}
+  function dn(e,m){e.preventDefault();drag=m;dx=e.clientX??e.touches?.[0]?.clientX??0;ds=vcSegStart;window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);window.addEventListener('touchmove',mv,{passive:false});window.addEventListener('touchend',up);}
+  function mv(e){if(!drag)return;e.preventDefault();const cx=e.clientX??e.touches?.[0]?.clientX??0;vcSegStart=Math.max(0,Math.min(ds+px2s(cx-dx),refAudioDurSec-Math.min(VC_SEG_LEN,refAudioDurSec)));updateVCSel();}
+  function up(){drag=null;window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);window.removeEventListener('touchmove',mv);window.removeEventListener('touchend',up);}
+  document.addEventListener('DOMContentLoaded',()=>{
+    $('vcHandleL').addEventListener('mousedown',e=>dn(e,'L'));$('vcHandleR').addEventListener('mousedown',e=>dn(e,'R'));
+    $('vcSelBar').addEventListener('mousedown',e=>dn(e,'bar'));
+    $('vcWaveOuter').addEventListener('mousedown',e=>{if(['vcWaveOuter','vcWaveCanvas','vcSelLeft','vcSelRight'].includes(e.target.id))dn(e,'bar');});
+    $('vcHandleL').addEventListener('touchstart',e=>dn(e,'L'),{passive:false});$('vcHandleR').addEventListener('touchstart',e=>dn(e,'R'),{passive:false});
   });
 })();
 
-// Encode voice segment — sends raw Float32Array slice to worker
-window.encodeVoiceSegment = async function() {
-  if (!refAudioFull) { alert('Load a reference audio file first.'); return; }
-  const startSample = Math.floor(vcSegStart * SAMPLE_RATE);
-  const endSample   = Math.min(startSample + VC_SEG_LEN * SAMPLE_RATE, refAudioFull.length);
-  const segment     = refAudioFull.slice(startSample, endSample);
-
-  $('btnEncode').disabled = true;
-  $('vcEncodeStatus').textContent = 'Encoding…';
-  $('vcEncodeStatus').style.color = 'var(--warn)';
-
-  // Use the worker's encode path (same as before — passes audio buffer)
-  const buf = segment.buffer.slice(segment.byteOffset, segment.byteOffset + segment.byteLength);
-  worker.postMessage({ type: 'encode', audioData: buf }, [buf]);
+window.encodeVoiceSegment=async function(){
+  if(!refAudioFull){alert('Load a reference audio file first.');return;}
+  const s0=Math.floor(vcSegStart*SAMPLE_RATE),s1=Math.min(s0+VC_SEG_LEN*SAMPLE_RATE,refAudioFull.length);
+  const seg=refAudioFull.slice(s0,s1);
+  $('btnEncode').disabled=true; $('vcEncodeStatus').textContent='Encoding…'; $('vcEncodeStatus').style.color='var(--warn)';
+  const b=seg.buffer.slice(seg.byteOffset,seg.byteOffset+seg.byteLength);
+  worker.postMessage({type:'encode',audioData:b},[b]);
 };
 
-window.previewSelectedSegment = function() {
-  if (!refAudioFull) return;
-  const btn = $('btnPreviewSeg');
-  if (window._previewSrc) {
-    try { window._previewSrc.stop(); } catch(_) {}
-    window._previewSrc = null;
-    btn.textContent = '▶ Preview';
-    return;
-  }
-  const startSample = Math.floor(vcSegStart * SAMPLE_RATE);
-  const endSample   = Math.min(startSample + VC_SEG_LEN * SAMPLE_RATE, refAudioFull.length);
-  const seg         = refAudioFull.slice(startSample, endSample);
-  const ctx         = new AudioContext({ sampleRate: SAMPLE_RATE });
-  const buf         = ctx.createBuffer(1, seg.length, SAMPLE_RATE);
-  buf.copyToChannel(seg, 0);
-  const src = ctx.createBufferSource();
-  src.buffer = buf;
-  src.connect(ctx.destination);
-  src.start();
-  window._previewSrc = src;
-  btn.textContent    = '■ Stop';
-  src.onended = () => { window._previewSrc = null; btn.textContent = '▶ Preview'; ctx.close(); };
+window.previewSelectedSegment=function(){
+  if(!refAudioFull)return;
+  const btn=$('btnPreviewSeg');
+  if(window._prvSrc){try{window._prvSrc.stop();}catch(_){}window._prvSrc=null;btn.textContent='▶ Preview';return;}
+  const s0=Math.floor(vcSegStart*SAMPLE_RATE),s1=Math.min(s0+VC_SEG_LEN*SAMPLE_RATE,refAudioFull.length);
+  const seg=refAudioFull.slice(s0,s1);
+  const ctx=new AudioContext({sampleRate:SAMPLE_RATE}),ab=ctx.createBuffer(1,seg.length,SAMPLE_RATE);
+  ab.copyToChannel(seg,0);const src=ctx.createBufferSource();src.buffer=ab;src.connect(ctx.destination);src.start();
+  window._prvSrc=src;btn.textContent='■ Stop';
+  src.onended=()=>{window._prvSrc=null;btn.textContent='▶ Preview';ctx.close();};
 };
 
-window.clearReferenceVoice = function() {
-  refAudioFull = null;
-  $('vcWaveWrap').style.display = 'none';
-  $('refAudioStatus').style.display = 'none';
-  $('voiceFile').value = '';
-  $('vcStatus').textContent = 'required';
-  $('vcStatus').style.color = 'var(--warn)';
-  $('vcEncodeStatus').textContent = '';
-  btnGen.disabled = true;
+window.clearReferenceVoice=function(){
+  refAudioFull=null;$('vcWaveWrap').style.display='none';$('refAudioStatus').style.display='none';
+  $('voiceFile').value='';$('vcStatus').textContent='required';$('vcStatus').style.color='var(--warn)';
+  $('vcEncodeStatus').textContent='';btnGen.disabled=true;
 };
 
 // ── Mic recording ─────────────────────────────────────────────────────────────
-let _mediaRecorder = null, _recChunks = [], _recTimerID = null, _recStartMs = 0;
-
-window.startRecording = async function() {
-  if (_mediaRecorder) return;
-  try {
-    const stream   = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    const mimeType = ['audio/webm;codecs=opus','audio/webm','audio/ogg']
-                       .find(m => MediaRecorder.isTypeSupported(m)) || '';
-    _mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
-    _recChunks = [];
-    _mediaRecorder.ondataavailable = e => { if (e.data.size > 0) _recChunks.push(e.data); };
-    _mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
-      clearInterval(_recTimerID); _recTimerID = null;
-      $('recTimer').textContent = '';
-      $('btnRecord').disabled   = false;
-      $('btnStopRec').disabled  = true;
-      $('recStatus').textContent = 'Processing…';
-      try {
-        const blob = new Blob(_recChunks, { type: _mediaRecorder.mimeType || 'audio/webm' });
-        await loadAudioBuffer(await blob.arrayBuffer(), 'Recorded voice');
-        $('recStatus').textContent = '';
-      } catch(e) {
-        $('recStatus').textContent = `✗ ${e.message ?? String(e)}`;
-      }
-      _mediaRecorder = null;
+let _mr=null,_rc=[],_rt=null,_rs=0;
+window.startRecording=async function(){
+  if(_mr)return;
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    const mt=['audio/webm;codecs=opus','audio/webm','audio/ogg'].find(m=>MediaRecorder.isTypeSupported(m))||'';
+    _mr=new MediaRecorder(s,mt?{mimeType:mt}:{});_rc=[];
+    _mr.ondataavailable=e=>{if(e.data.size>0)_rc.push(e.data);};
+    _mr.onstop=async()=>{
+      s.getTracks().forEach(t=>t.stop());clearInterval(_rt);_rt=null;
+      $('recTimer').textContent='';$('btnRecord').disabled=false;$('btnStopRec').disabled=true;
+      $('recStatus').textContent='Processing…';
+      try{const b=new Blob(_rc,{type:_mr.mimeType||'audio/webm'});await loadAudioBuffer(await b.arrayBuffer(),'Recorded voice');$('recStatus').textContent='';}
+      catch(e){$('recStatus').textContent='✗ '+e.message;}
+      _mr=null;
     };
-    _mediaRecorder.start(100);
-    _recStartMs = Date.now();
-    $('btnRecord').disabled  = true;
-    $('btnStopRec').disabled = false;
-    $('recStatus').textContent = 'Recording…';
-    _recTimerID = setInterval(() => {
-      const s = ((Date.now() - _recStartMs) / 1000).toFixed(1);
-      $('recTimer').textContent = `${s}s`;
-      if (parseFloat(s) >= 60) window.stopRecording();
-    }, 100);
-  } catch(e) {
-    $('recStatus').textContent = `✗ ${e.message ?? String(e)}`;
-  }
+    _mr.start(100);_rs=Date.now();$('btnRecord').disabled=true;$('btnStopRec').disabled=false;$('recStatus').textContent='Recording…';
+    _rt=setInterval(()=>{const s=((Date.now()-_rs)/1000).toFixed(1);$('recTimer').textContent=s+'s';if(parseFloat(s)>=60)window.stopRecording();},100);
+  }catch(e){$('recStatus').textContent='✗ '+e.message;}
 };
-
-window.stopRecording = function() {
-  if (_mediaRecorder && _mediaRecorder.state !== 'inactive') _mediaRecorder.stop();
-};
-
-// ── Generate ──────────────────────────────────────────────────────────────────
-btnGen.addEventListener('click', () => {
-  const text = txtInput.value.trim();
-  if (!text) return;
-  btnGen.disabled = true;
-  updateRTF(null);
-  updateBuffer(0);
-  const exagVal_ = parseFloat(exag.value);
-  runGeneration(text, exagVal_).catch(err => {
-    chip(loadChip, 'Error: ' + err.message, 'err');
-    btnGen.disabled = false;
-  });
-});
-
-exag.addEventListener('input', () => { exagVal.textContent = parseFloat(exag.value).toFixed(2); });
+window.stopRecording=function(){if(_mr&&_mr.state!=='inactive')_mr.stop();};
 
 // ── Waveform ──────────────────────────────────────────────────────────────────
-function drawWaveform(samples) {
-  const wrap   = $('waveformWrap');
-  const canvas = $('waveformCanvas');
-  const idle   = $('waveformIdle');
-  idle.style.display   = 'none';
-  canvas.style.display = 'block';
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-  canvas.width = W; canvas.height = H;
-  const ctx   = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-  const step  = Math.max(1, Math.floor(samples.length / W));
-  const mid   = H / 2, scale = mid * 0.9;
-  ctx.beginPath();
-  ctx.strokeStyle = getComputedStyle(document.documentElement)
-                      .getPropertyValue('--green').trim();
-  ctx.lineWidth = 1;
-  for (let x = 0; x < W; x++) {
-    const val = samples[Math.min(x * step, samples.length - 1)];
-    const y   = mid - val * scale;
-    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  }
+function drawWaveform(samples){
+  const wr=$('waveformWrap'),cv=$('waveformCanvas');
+  $('waveformIdle').style.display='none';cv.style.display='block';
+  const W=wr.clientWidth,H=wr.clientHeight;cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d'),step=Math.max(1,Math.floor(samples.length/W)),mid=H/2,sc=mid*.9;
+  ctx.beginPath();ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--green').trim();ctx.lineWidth=1;
+  for(let x=0;x<W;x++){const v=samples[Math.min(x*step,samples.length-1)];const y=mid-v*sc;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
   ctx.stroke();
 }
 
 // ── WAV encoder ───────────────────────────────────────────────────────────────
-function encodeWAV(samples, sr) {
-  const len = samples.length * 2;
-  const ab  = new ArrayBuffer(44 + len);
-  const v   = new DataView(ab);
-  const s   = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
-  s(0,'RIFF'); v.setUint32(4, 36 + len, true);
-  s(8,'WAVE'); s(12,'fmt ');
-  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
-  v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true);
-  v.setUint16(32, 2, true);  v.setUint16(34, 16, true);
-  s(36,'data'); v.setUint32(40, len, true);
-  let off = 44;
-  for (let i = 0; i < samples.length; i++, off += 2) {
-    const x = Math.max(-1, Math.min(1, samples[i]));
-    v.setInt16(off, x < 0 ? x * 0x8000 : x * 0x7FFF, true);
-  }
+function encodeWAV(s,sr){
+  const l=s.length*2,ab=new ArrayBuffer(44+l),v=new DataView(ab);
+  const w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));};
+  w(0,'RIFF');v.setUint32(4,36+l,true);w(8,'WAVE');w(12,'fmt ');
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+  w(36,'data');v.setUint32(40,l,true);let off=44;
+  for(let i=0;i<s.length;i++,off+=2){const x=Math.max(-1,Math.min(1,s[i]));v.setInt16(off,x<0?x*0x8000:x*0x7FFF,true);}
   return ab;
 }
 
 // ── Download ──────────────────────────────────────────────────────────────────
-btnDl.addEventListener('click', () => {
-  const cp = window._lastPlayer;
-  if (!cp) return;
-  const a = document.createElement('a');
-  a.href     = URL.createObjectURL(new Blob([encodeWAV(cp.combined(), SAMPLE_RATE)], { type: 'audio/wav' }));
-  a.download = 'chatterbox_turbo.wav';
-  a.click();
+btnDl.addEventListener('click',()=>{
+  const cp=window._lastCP;if(!cp)return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([encodeWAV(cp.combined(),SAMPLE_RATE)],{type:'audio/wav'}));
+  a.download='chatterbox_turbo.wav';a.click();
 });
 </script>
 </body>

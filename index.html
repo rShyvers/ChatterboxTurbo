@@ -88,8 +88,7 @@ button:disabled{opacity:.35;cursor:not-allowed}
 audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-radius:6px}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;animation:pulse 1.1s ease-in-out infinite;vertical-align:middle}
-#fp32Row{display:none;align-items:center;gap:.4rem;color:var(--muted);font-size:.82rem}
-#fp32Row input{accent-color:var(--accent)}
+#quantRow{display:none;align-items:center;gap:.4rem;color:var(--muted);font-size:.82rem}
 </style>
 </head>
 <body>
@@ -108,7 +107,17 @@ audio{width:100%;margin-top:.25rem;filter:invert(.85) hue-rotate(180deg);border-
           <option value="hybrid">WebGPU hybrid — LM on GPU only</option>
           <option value="full">WebGPU full (may be silent on AMD/Mesa)</option>
         </select>
-        <div id="fp32Row"><input type="checkbox" id="chkFp32"><label for="chkFp32" style="cursor:pointer">Force fp32 LM</label></div>
+        <div id="quantRow">
+          <label for="selQuant" style="white-space:nowrap">dtype</label>
+          <select id="selQuant" style="flex:1">
+            <option value="auto">auto (q4f16 if GPU+f16, else fp32)</option>
+            <option value="q4f16">q4f16 — 4-bit + fp16 activations (fastest)</option>
+            <option value="q4">q4 — 4-bit (no fp16)</option>
+            <option value="fp16">fp16 — half precision</option>
+            <option value="quantized">quantized — INT8</option>
+            <option value="fp32">fp32 — full precision (safest)</option>
+          </select>
+        </div>
       </div>
       <div class="ep-row">
         <span class="ep-chip" id="ep-webgpu">webgpu</span>
@@ -266,7 +275,7 @@ let _abortRequested = false;
 
 self.onmessage = async ({ data: msg }) => {
   try {
-    if      (msg.type === 'load')    await load(msg.device, msg.hasF16, msg.forceFp32, msg.gpuMode);
+    if      (msg.type === 'load')    await load(msg.device, msg.hasF16, msg.quantOverride, msg.gpuMode);
     else if (msg.type === 'encode')  await encode(msg.audioData);
     else if (msg.type === 'gen_one') await genOne(msg.text, msg.exaggeration, msg.maxNewTokens, msg.addSilence ?? false);
     else if (msg.type === 'abort')   { _abortRequested = true; }
@@ -331,7 +340,7 @@ async function decodeFull(allToks, addSilence) {
 }
 
 // ── load ──────────────────────────────────────────────────────────────────────
-async function load(device, hasF16, forceFp32, gpuMode = 'full') {
+async function load(device, hasF16, quantOverride, gpuMode = 'full') {
   _abortRequested = false;
   if (model)     { try { await model.dispose?.();     } catch(_){} model = null; }
   if (processor) { try { await processor.dispose?.(); } catch(_){} processor = null; }
@@ -341,7 +350,13 @@ async function load(device, hasF16, forceFp32, gpuMode = 'full') {
   processor = await AutoProcessor.from_pretrained(MODEL_ID, { progress_callback: p => emit('dl_progress', p) });
   emit('status', { text: 'Loading model weights…', cls: 'warn' });
 
-  const lmDtype = (device === 'webgpu' && hasF16 && !forceFp32) ? 'q4f16' : 'fp32';
+  // Resolve the LM dtype from the quant selector.
+  // 'auto' replicates the original behaviour: q4f16 on WebGPU+f16, fp32 otherwise.
+  // All other values are passed through directly — the user knows what they picked.
+  const lmDtype = (!quantOverride || quantOverride === 'auto')
+    ? ((device === 'webgpu' && hasF16) ? 'q4f16' : 'fp32')
+    : quantOverride;
+
   let sessionDevice, dtype;
   if (device === 'webgpu' && gpuMode === 'full') {
     sessionDevice = 'webgpu';
@@ -351,7 +366,7 @@ async function load(device, hasF16, forceFp32, gpuMode = 'full') {
     dtype = { embed_tokens:'fp32', speech_encoder:'fp32', language_model:lmDtype, conditional_decoder:'fp32' };
   } else {
     sessionDevice = 'wasm';
-    dtype = { embed_tokens:'fp32', speech_encoder:'fp32', language_model:'fp32', conditional_decoder:'fp32' };
+    dtype = { embed_tokens:'fp32', speech_encoder:'fp32', language_model:lmDtype, conditional_decoder:'fp32' };
   }
 
   model = await ChatterboxModel.from_pretrained(MODEL_ID, {
@@ -710,9 +725,6 @@ function splitSentences(text) {
 }
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
-// Use a live getter so these work regardless of when the module evaluates.
-// getElementById always returns the element (or null before parse, but the
-// <script type="module"> at body-end ensures the DOM is ready by eval time).
 const $ = id => document.getElementById(id);
 let loadChip, dlProg, dlFill, devBadge, btnLoad, btnGen, btnStop;
 let exag, exagVal, ckWrap, ckFill, ckLabel;
@@ -726,8 +738,6 @@ function initDOM() {
   statRTF = $('statRTF'); statBuf = $('statBuf'); statTTFA = $('statTTFA'); bufFill = $('bufFill');
   outCard = $('outCard'); player = $('player'); btnDl = $('btnDl');
 }
-// Module scripts run after HTML is parsed (they're deferred by spec), so the
-// DOM is ready immediately — but call initDOM() explicitly to be safe.
 initDOM();
 
 const BUF_MAX = 6.0, BUF_LOW = 0.4;
@@ -783,11 +793,11 @@ function onWorkerMessage({ data: msg }) {
       const {device:dev,hasF16,lmDtype} = msg.data;
       dlProg.style.display='none';
       setEP('webgpu',dev==='webgpu'); setEP('wasm',true); setEP('f16',hasF16);
-      devBadge.textContent=dev.toUpperCase();
+      devBadge.textContent=`${dev.toUpperCase()} · ${lmDtype}`;
       devBadge.className=`badge ${dev}`; devBadge.style.display='inline-block';
       btnLoad.disabled=true; btnGen.disabled=true;
       $('btnEncode').disabled=false;
-      chip(loadChip,`Model ready — encode a reference voice to generate`,'ok');
+      chip(loadChip,`Model ready (${lmDtype}) — encode a reference voice to generate`,'ok');
       break;
     }
 
@@ -826,7 +836,7 @@ function onWorkerMessage({ data: msg }) {
         respawnWorker();
         chip(loadChip,
           '⚠ Out of memory — model weights exceed available RAM/VRAM.<br>'+
-          'Try: <b>1)</b> WASM backend &nbsp;<b>2)</b> Force fp32 LM &nbsp;<b>3)</b> Close other tabs.','err');
+          'Try: <b>1)</b> WASM backend &nbsp;<b>2)</b> q4f16 or q4 dtype &nbsp;<b>3)</b> Close other tabs.','err');
         btnLoad.disabled=false;
       } else {
         chip(loadChip,'Error: '+raw,'err'); btnLoad.disabled=false;
@@ -854,7 +864,7 @@ async function detectGPU() {
 }
 
 $('selMode').addEventListener('change', () => {
-  $('fp32Row').style.display = $('selMode').value !== 'wasm' ? 'flex' : 'none';
+  $('quantRow').style.display = $('selMode').value !== 'wasm' ? 'flex' : 'none';
 });
 (async () => {
   setEP('wasm',true);
@@ -864,7 +874,7 @@ $('selMode').addEventListener('change', () => {
 // ── Load button ───────────────────────────────────────────────────────────────
 btnLoad.addEventListener('click', async () => {
   btnLoad.disabled=true; _dlFiles={}; _dlLoaded={};
-  const gpuMode=($('selMode').value), forceFp32=$('chkFp32').checked;
+  const gpuMode=($('selMode').value), quantOverride=$('selQuant').value;
   let device='wasm', hasF16=false;
   if (gpuMode !== 'wasm') {
     chip(loadChip,'Checking WebGPU…','warn');
@@ -873,10 +883,13 @@ btnLoad.addEventListener('click', async () => {
     else chip(loadChip,'No WebGPU — falling back to WASM','warn');
   }
   const eff = device==='webgpu' ? gpuMode : 'wasm';
-  const lm  = (device==='webgpu'&&hasF16&&!forceFp32)?'q4f16':'fp32';
-  chip(loadChip,`${device==='webgpu'?`WebGPU ${eff} · ${lm}`:'WASM fp32'} · downloading…`,'warn');
-  console.log(`[main] load device=${device} gpuMode=${eff} lmDtype=${lm} forceFp32=${forceFp32}`);
-  worker.postMessage({ type:'load', device, hasF16, forceFp32, gpuMode:eff });
+  // Compute effective dtype for the status chip (mirrors worker logic)
+  const effDtype = (!quantOverride || quantOverride === 'auto')
+    ? ((device==='webgpu'&&hasF16)?'q4f16':'fp32')
+    : quantOverride;
+  chip(loadChip,`${device==='webgpu'?`WebGPU ${eff}`:'WASM'} · ${effDtype} · downloading…`,'warn');
+  console.log(`[main] load device=${device} gpuMode=${eff} quantOverride=${quantOverride} effDtype=${effDtype}`);
+  worker.postMessage({ type:'load', device, hasF16, quantOverride, gpuMode:eff });
 });
 
 // ── Generate + Stop ───────────────────────────────────────────────────────────
